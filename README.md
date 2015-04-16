@@ -12,8 +12,8 @@ An advanced login system build upon bootstrap with features like
 
 == Major changes ==  
 - only admin can create a user - no self registration
-- TOTP QR image generated for new users
-- QR Code can be re-read or regenerated on admin panel 
+- TOTP QR image generated for new users https://raw.githubusercontent.com/eminhuseynov/master-login-system/master/screenshots/user-created.png 
+- QR Code can be re-read or regenerated on admin panel https://raw.githubusercontent.com/eminhuseynov/master-login-system/master/screenshots/user-created.png 
  
 
 == Install ==  
