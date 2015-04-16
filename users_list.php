@@ -107,9 +107,9 @@ include 'header.php';
 echo "
 <div class='container'>
 
-  <h3 class='pull-left'>Users on ".$set->site_name."</h3>
-
-  <form class='form-search' action='?'>
+  <h3 class='pull-left'>Users on ".$set->site_name."</h3> <div class='clearfix'></div>
+<a  class='btn' href='register.php'>Create a user</a>
+  <form class='form-search' action='?'> 
     <div class='input-append pull-right'>
       <input class='span2 search-query' name='q' type='text' ".( isset($_GET['q']) ? "value='".$options->html($_GET['q'])."'" : "" )." placeholder='Search...'/>
       <button type='submit' class='btn'><i class='icon-search'></i></button>
@@ -117,6 +117,7 @@ echo "
       ".$options->queryString("hidden", array("q","page"))."
     </div>
   </form>
+ 
   <div class='clearfix'></div>
 
   <div class='btn-group pull-right'>

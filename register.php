@@ -11,16 +11,37 @@
 include "inc/init.php";
 include 'lib/captcha/captcha.php';
 
+
+function generate_secret_key($length = 16) {
+		$b32 	= "234567QWERTYUIOPASDFGHJKLZXCVBNM";
+		$s 	= "";
+
+		for ($i = 0; $i < $length; $i++)
+			$s .= $b32[rand(0,31)];
+
+		return $s;
+	}
+
+	
+	
+/*
 if($user->islg()) { // if it's alreadt logged in redirect to the main page
   header("Location: $set->url");
   exit;
+}
+*/
+
+//Only allow Admin registration
+if(!$user->isAdmin()) {
+    header("Location: $set->url");
+    exit;
 }
 
 
 $page->title = "Register to ". $set->site_name;
 
 // determine if captcha code is correct
-$captcha = ((!$set->captcha) || ($set->captcha && isset($_SESSION['captcha']) && isset($_POST['captcha']) && ($_SESSION['captcha']['code'] === $_POST['captcha'])));
+$captcha = 1;
 
 if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']) && $set->register && $captcha) {
 
@@ -55,6 +76,8 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
 
 
   if(!isset($page->error)){
+  $totpkey=generate_secret_key();
+  
     $user_data = array(
       "username" => $name,
       "display_name" => $display_name,
@@ -62,6 +85,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
       "email" => $email,
       "lastactive" => time(),
       "regtime" => time(),
+	  "key" => $totpkey,
       "validated" => 1
       );
 
@@ -83,7 +107,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
 
     if(($db->query("INSERT INTO `".MLS_PREFIX."users` SET ?u", $user_data)) && ($id = $db->insertId()) && $db->query("INSERT INTO `".MLS_PREFIX."privacy` SET `userid` = ?i", $id)) {
       $page->success = 1;
-      $_SESSION['user'] = $id; // we automatically login the user
+      //$_SESSION['user'] = $id; // we automatically login the user
       $user = new User($db);
     } else
       $page->error = "There was an error ! Please try again !";
@@ -105,7 +129,7 @@ if(!$set->register) // we check if the registration is enabled
   $options->fError("We are sorry registration is blocked momentarily please try again leater !");
 
 
-$_SESSION['token'] = sha1(rand()); // random token
+//$_SESSION['token'] = sha1(rand()); // random token
 
 if($set->captcha)
   $_SESSION['captcha'] = captcha();
@@ -122,8 +146,9 @@ if(isset($page->success)) {
     <div class='span3 hidden-phone'></div>
     <div class='span6 well'>
     <h1>Congratulations !</h1>";
-    $options->success("<p><strong>Your account was successfully registered !</strong></p>");
-    echo " <a class='btn btn-primary' href='$set->url'>Start exploring</a>
+    $options->success("<p><strong>the account was successfully registered !</strong></p>");
+echo "Enroll with soft token by scanning this code<br> <img src='https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=otpauth://totp/".preg_replace('/\s+/', '',$set->site_name).":".$email."?secret=".$totpkey."&issuer=".$set->site_name."'><br>";
+    echo " <a class='btn btn-primary' href='user.php?id=".$id."'>user profile</a>
     </div>
   </div>";
 
@@ -179,7 +204,7 @@ else
             </div>
           </div>
           <input type='hidden' name='token' value='".$_SESSION['token']."'>
-          $captcha
+          
           <div class='form-actions'>
           <button type='submit' class='btn btn-primary btn-large'>Register</button>
             <button type='reset' class='btn'>Reset</button>

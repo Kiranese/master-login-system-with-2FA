@@ -50,7 +50,7 @@ if($_POST) {
       
       	$email = $_POST['email'];
       	$display_name = $_POST['display_name'];
-
+		$key = $_POST['key'];
 
       	$extra = '';
       	if($can_edit) {
@@ -84,7 +84,7 @@ if($_POST) {
 	    if(!isset($display_name[3]) || isset($display_name[50]))
 		    $page->error = "Display name too short or too long !";	  
 
-	  	if(!isset($page->error) && $db->query("UPDATE `".MLS_PREFIX."users` SET `email` = ?s, `display_name` = ?s ?p WHERE `userid` = ?i", $email, $display_name, $extra, $u->userid)) {
+	  	if(!isset($page->error) && $db->query("UPDATE `".MLS_PREFIX."users` SET `email` = ?s, `display_name` = ?s , `key` = ?s  ?p WHERE `userid` = ?i", $email, $display_name,$key ,$extra, $u->userid)) {
 	  		$page->success = "Info was saved !";
 	  		// we make sure we show updated data
 			$u = $db->getRow("SELECT * FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $u->userid);
@@ -194,6 +194,8 @@ if($can_edit) {
 		    </select>
 		  </div>
 		</div> 
+		
+	 
 	";
 
 
@@ -220,6 +222,16 @@ echo "
           </div>
         </div>
 
+		
+		  <div class='control-group'>
+          <div class='control-label'>
+            <label>TOTP Key</label>
+          </div>
+          <div class='controls'>
+            <input type='password' name='key' id=key class='input-large' value='".$options->html($u->key)."'><br><button type='button' id='showqr' onClick='showQR()' class='btn'>Show QR</button>
+          <button type='button' id='showqr' onClick='genQR()' class='btn'>New QR</button></div>
+        </div>
+		
         <div class='control-group'>
           <div class='controls'>
           <button type='submit' id='submit' class='btn btn-primary'>Save</button>
@@ -227,6 +239,61 @@ echo "
         </div>
       </fieldset>
 </form>";
+?> 
+<script>
+function showQR() {
+
+document.getElementById('showqrimage').innerHTML="<img align=left src='https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=otpauth://totp/<?=preg_replace('/\s+/', '',$set->site_name)?>:<?=$u->email?>?secret="+document.getElementById('key').value+"&issuer=<?=$set->site_name?>'> <br><p >Scan the image with your mobile app <br> or enter the code below manually:<br><br><code>"+document.getElementById('key').value+"</code><hr><h4>DO NOT FORGET TO SAVE IF THE CODE WAS CHANGED!</h4>";
+
+ $('#imagemodal').modal('show');
+ 
+}
+function genQR() {
+
+var key =  genKey(16);
+ 	
+document.getElementById('key').value=key;
+
+showQR()
+
+}
+
+
+function genKey(length) {
+  if (!length) length = 16;
+
+  var set = '234567QWERTYUIOPASDFGHJKLZXCVBNM';
+
+  
+  var key = '';
+
+  for(var i=0; i < length; i++) {
+    key += set.charAt(Math.floor(Math.random() * set.length));
+  }
+  
+  return key;
+}
+
+
+
+</script>
+<!-- Creates the bootstrap modal where the image will appear -->
+<div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">QR Code Image</h4>
+      </div>
+      <div class="modal-body" id=showqrimage>
+        
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<?
 if(!$can_edit)
 	echo "<a href='?password=1'>Change Password</a>";
 
@@ -234,5 +301,6 @@ if(!$can_edit)
 }
 
 echo "</div>
+ 
 	</div><!-- /container -->";
 include 'footer.php';

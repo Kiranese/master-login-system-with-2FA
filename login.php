@@ -61,19 +61,41 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
     } else {
         $name = $_POST['name'];
         $password = $_POST['password'];
+$otp = $_POST['otp'];
 
-
-        if(!($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s AND `password` = ?s", $name, sha1($password))))
+        if(!($usr = $db->getRow("SELECT `userid`, `key` FROM `".MLS_PREFIX."users` WHERE `username` = ?s AND `password` = ?s", $name, sha1($password))))
             $page->error = "Username or password are wrong !";
         else {
+$proceed=0;
+	
+if ($usr->key) {	
+$TimeStamp	  = Google2FA::get_timestamp();
+$secretkey 	  = Google2FA::base32_decode($usr->key);
+if ( Google2FA::oath_hotp($secretkey, $TimeStamp)==$otp ) { $proceed=1; } } else {
+
+ $proceed=1; 
+
+}
+
+ 
+
+ if ($proceed==1) {
+		
+		
             if($_POST['r'] == 1){
                 $path_info = parse_url($set->url);
                 setcookie("user", $name, time() + 3600 * 24 * 30, $path_info['path']); // set
                 setcookie("pass", sha1($password), time() + 3600 * 24 * 30, $path_info['path']); // set
+				
             }
             $_SESSION['user'] = $usr->userid;
             header("Location: $set->url");
             exit;
+			
+			} else {
+			
+			      $page->error = "OTP provided is wrong !";
+			}
         }
     }
 } else if($_POST)
@@ -176,6 +198,18 @@ if(isset($_GET['forget'])) {
                 <!-- <span class='help-block'>Example block-level help text here.</span> -->
               </div>
               
+			 <br>
+			 <div class='control-group'>
+              <div class='control-label'>
+                <label>TOTP Token</label>
+              </div>
+              <div class='controls'>
+                <input type='text' placeholder='type your one-time password' name='otp' class='input-large'>
+
+				 
+              </div>
+			  
+			  
 
             </div>
             <div class='control-group'>            

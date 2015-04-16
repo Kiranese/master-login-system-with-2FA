@@ -55,7 +55,7 @@ include "../header.php";
       <li class="nav-header">ADMIN OPTIONS</li>
       <li class='active'><a href='?'>General Settings</a></li>
       <li><a href='groups.php'>Groups Management</a></li>
-    </ul>
+	 </ul>
    </div><!--/.well -->
  </div><!--/span-->
  <div class="span9">

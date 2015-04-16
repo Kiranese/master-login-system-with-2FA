@@ -33,19 +33,7 @@ class presets {
                             "class" => $this->isActive("contact")),
                       "id" => "contact");
 
-      $var[] = array("dropdown",
-                      array(  0 => array("href" => "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=T9HU2KAF54EBE&lc=RO&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted",
-                                       "name" => "Donate",
-                                       "class" => 0),
-
-                              1 => array("href" => "https://github.com/ionutvmi/master-login-system",
-                                         "name" => "Fork Me On Github",
-                                         "class" => 0),
-                          ),
-                      "class" => 0,
-                      "style" => 0,
-                      "name" => "Extra",
-                      "id" => "extra");      
+        
       if($user->group->type == 3) // we make it visible for admins only
       $var[] = array("item",
                       array("href" => $set->url."/admin",
