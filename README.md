@@ -10,10 +10,6 @@ An advanced login system build upon bootstrap with features like
 - contact form  
 - member list  
 
-Video Walkthrough  
-http://www.youtube.com/watch?v=y7SdQfZfLbA
-
-
 == Install ==  
 
 1. Upload the files to your server  
