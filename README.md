@@ -9,6 +9,11 @@ An advanced login system build upon bootstrap with features like
 - groups system (member, moderator, administrator and your custom one)  
 - contact form  
 - member list  
+
+== Major changes ==  
+- only admin can create a user - no self registration
+- TOTP QR image generated for new users
+- QR Code can be re-read or regenerated on admin panel 
  
 
 == Install ==  
